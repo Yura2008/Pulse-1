@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['.github/workflows/build-pulse.yml']
+    paths: ['.github/workflows/build-pulse.yml', 'pulse-v1_1-patch.py']
 
 jobs:
   build:
@@ -37,6 +37,9 @@ jobs:
           kotlin.compiler.execution.strategy=in-process
           EOF
           grep -F 'import androidx.health.connect.client.PermissionController' source/Pulse_Android_Source/app/src/main/java/com/pulse/health/MainActivity.kt
+
+      - name: Apply Pulse v1.1 improvements
+        run: python3 pulse-v1_1-patch.py source/Pulse_Android_Source
 
       - name: Set up Java
         uses: actions/setup-java@v4
