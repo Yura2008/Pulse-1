@@ -28,7 +28,7 @@ put('res/mipmap-anydpi-v26/ic_launcher.xml','''
 </adaptive-icon>
 ''')
 repo=java/'HealthConnectRepository.kt'
-change(repo,'import androidx.health.connect.client.HealthConnectClient','import androidx.health.connect.client.HealthConnectClient\nimport androidx.health.connect.client.feature.HealthConnectFeatures')
+change(repo,'import androidx.health.connect.client.HealthConnectClient','import androidx.health.connect.client.HealthConnectClient\nimport androidx.health.connect.client.HealthConnectFeatures')
 change(repo,'    private val client: HealthConnectClient get() = HealthConnectClient.getOrCreate(context)','''
     private val client: HealthConnectClient get() = HealthConnectClient.getOrCreate(context)
     val backgroundReadAvailable: Boolean get() = available && try {
