@@ -1,0 +1,51 @@
+name: Build Pulse APK from ZIP
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Unpack Pulse source
+        run: |
+          test -f Pulse_Android_Source_v1.zip
+          mkdir source
+          unzip -q Pulse_Android_Source_v1.zip -d source
+          test -f source/Pulse_Android_Source/settings.gradle.kts
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android 36 SDK
+        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Build APK
+        working-directory: source/Pulse_Android_Source
+        run: gradle --no-daemon :app:assembleDebug --stacktrace
+
+      - name: Verify APK exists
+        run: test -s source/Pulse_Android_Source/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Downloadable APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Pulse-debug-APK
+          path: source/Pulse_Android_Source/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
