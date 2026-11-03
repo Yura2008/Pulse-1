@@ -2,6 +2,9 @@ name: Build Pulse APK from ZIP
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/build-pulse.yml']
 
 jobs:
   build:
@@ -22,6 +25,18 @@ jobs:
       - name: Enable AndroidX
         run: |
           printf '%s\n' 'android.useAndroidX=true' 'android.enableJetifier=true' >> source/Pulse_Android_Source/gradle.properties
+
+      - name: Fix Health Connect import and Gradle memory
+        shell: bash
+        run: |
+          sed -i 's/^import androidx.health.connect.client.permission.PermissionController$/import androidx.health.connect.client.PermissionController/' source/Pulse_Android_Source/app/src/main/java/com/pulse/health/MainActivity.kt
+          cat >> source/Pulse_Android_Source/gradle.properties <<'EOF'
+          org.gradle.jvmargs=-Xmx3g -XX:MaxMetaspaceSize=1024m -Dfile.encoding=UTF-8
+          org.gradle.workers.max=2
+          org.gradle.parallel=false
+          kotlin.compiler.execution.strategy=in-process
+          EOF
+          grep -F 'import androidx.health.connect.client.PermissionController' source/Pulse_Android_Source/app/src/main/java/com/pulse/health/MainActivity.kt
 
       - name: Set up Java
         uses: actions/setup-java@v4
