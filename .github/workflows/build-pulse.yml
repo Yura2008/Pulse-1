@@ -19,6 +19,10 @@ jobs:
           unzip -q Pulse_Android_Source_v1.zip -d source
           test -f source/Pulse_Android_Source/settings.gradle.kts
 
+      - name: Enable AndroidX
+        run: |
+          printf '%s\n' 'android.useAndroidX=true' 'android.enableJetifier=true' >> source/Pulse_Android_Source/gradle.properties
+
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
